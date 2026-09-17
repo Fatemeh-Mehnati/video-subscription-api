@@ -1,0 +1,96 @@
+erDiagram
+  USER ||--o{ SUBSCRIPTION : has
+  PLAN ||--o{ SUBSCRIPTION : defines
+  USER ||--o{ PAYMENT : makes
+  SUBSCRIPTION ||--o{ PAYMENT : paid_by
+  USER ||--o{ VIDEO : uploads
+  USER ||--o{ WATCH_HISTORY : watches
+  VIDEO ||--o{ WATCH_HISTORY : in
+  USER ||--o{ RATING : gives
+  VIDEO ||--o{ RATING : receives
+  USER ||--o{ COMMENT : writes
+  VIDEO ||--o{ COMMENT : has
+  USER ||--o{ FAVORITE : saves
+  CATEGORY ||--o{ VIDEO : groups
+  COMMENT |o--o{ COMMENT : replies
+  VIDEO ||--o{ FAVORITE : in
+  USER {
+    int id PK
+    string username UK
+    string email UK
+    string password
+    bool is_staff
+    datetime date_joined
+  }
+  PLAN {
+    int id PK
+    string name UK
+    decimal price
+    int duration_days
+    int level
+    bool is_active
+  }
+  SUBSCRIPTION {
+    int id PK
+    int user_id FK
+    int plan_id FK
+    datetime start_at
+    datetime end_at
+    string status
+    bool auto_renew
+  }
+  PAYMENT {
+    int id PK
+    int user_id FK
+    int subscription_id FK
+    decimal amount
+    string status
+    string authority
+    string ref_id
+    datetime created_at
+  }
+  VIDEO {
+    int id PK
+    int uploaded_by FK
+    int category_id FK
+    string title
+    text description
+    string video_url
+    int required_level
+    int duration_seconds
+    int views_count
+    datetime created_at
+  }
+  WATCH_HISTORY {
+    int id PK
+    int user_id FK
+    int video_id FK
+    int progress_seconds
+    datetime watched_at
+  }
+  RATING {
+    int id PK
+    int user_id FK
+    int video_id FK
+    int score
+    datetime created_at
+  }
+  COMMENT {
+    int id PK
+    int user_id FK
+    int video_id FK
+    int parent_id FK "nullable"
+    text text
+    datetime created_at
+  }
+  FAVORITE {
+    int id PK
+    int user_id FK
+    int video_id FK
+    datetime created_at
+  }
+  CATEGORY {
+    int id PK
+    string name UK
+    string slug UK
+  }
