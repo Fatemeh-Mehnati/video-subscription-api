@@ -32,19 +32,23 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=Csv(
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    # must come first so it overrides runserver
+    "daphne",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    # third-party
     "rest_framework",
+    "django_filters",
+    "channels",
+    # local
     "accounts",
     "videos",
     "subscriptions",
     "payments",
-    "django_filters",
-    
 ]
 
 AUTH_USER_MODEL = "accounts.User"
@@ -154,3 +158,9 @@ SIMPLE_JWT = {
 
 # Mock payment gateway (development only)
 MOCK_GATEWAY_URL = "http://127.0.0.1:8000/api/payments/mock-gateway/"
+
+ASGI_APPLICATION = "config.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"},
+}

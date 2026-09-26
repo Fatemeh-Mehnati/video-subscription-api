@@ -22,6 +22,8 @@ from .serializers import (
     RatingSerializer,
     WatchHistorySerializer,
 )
+from .events import broadcast_video_update
+from django.views.generic import TemplateView
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
@@ -51,6 +53,8 @@ class VideoViewSet(viewsets.ModelViewSet):
     def watch(self, request, pk=None):
         video = self.get_object()
         Video.objects.filter(pk=video.pk).update(views_count=F("views_count") + 1)
+        video.refresh_from_db(fields=["views_count"])
+        broadcast_video_update(video.id, "view", {"views_count": video.views_count})
         return Response(
             {"id": video.id, "title": video.title, "video_url": video.video_url}
         )
@@ -73,6 +77,15 @@ class VideoViewSet(viewsets.ModelViewSet):
             user=request.user,
             video=video,
             defaults={"score": serializer.validated_data["score"]},
+        )
+        agg = video.ratings.aggregate(average=Avg("score"), count=Count("id"))
+        broadcast_video_update(
+            video.id,
+            "rating",
+            {
+                "average_rating": round(agg["average"], 2),
+                "ratings_count": agg["count"],
+            },
         )
         return Response(RatingSerializer(rating).data)
 
@@ -105,7 +118,17 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         video = get_object_or_404(Video, pk=self.kwargs["video_pk"])
-        serializer.save(user=self.request.user, video=video)
+        comment = serializer.save(user=self.request.user, video=video)
+        broadcast_video_update(
+            video.id,
+            "comment",
+            {
+                "comment_id": comment.id,
+                "user": comment.user.username,
+                "text": comment.text,
+                "parent": comment.parent_id,
+            },
+        )
 
     def get_object(self):
         obj = get_object_or_404(
@@ -140,3 +163,6 @@ class WatchHistoryViewSet(
 
     def get_queryset(self):
         return self.request.user.watch_history.select_related("video")
+
+class RealtimeTestView(TemplateView):
+    template_name = "videos/realtime_test.html"
