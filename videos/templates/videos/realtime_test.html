@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Realtime test</title></head>
+<body>
+  <h3>Live updates for video <span id="vid"></span></h3>
+  <ul id="log"></ul>
+  <script>
+    const videoId = new URLSearchParams(location.search).get("video") || "1";
+    document.getElementById("vid").textContent = videoId;
+
+    const socket = new WebSocket(`ws://${location.host}/ws/videos/${videoId}/`);
+    const log = (text) => {
+      const li = document.createElement("li");
+      li.textContent = `${new Date().toLocaleTimeString()} — ${text}`;
+      document.getElementById("log").prepend(li);
+    };
+
+    socket.onopen = () => log("connected");
+    socket.onclose = () => log("disconnected");
+    socket.onmessage = (e) => log(e.data);
+  </script>
+</body>
+</html>

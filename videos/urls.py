@@ -5,6 +5,7 @@ from .views import (
     CategoryViewSet,
     CommentViewSet,
     FavoriteViewSet,
+    RealtimeTestView,
     VideoViewSet,
     WatchHistoryViewSet,
 )
@@ -27,4 +28,5 @@ urlpatterns = router.urls + [
         comment_detail,
         name="comment-detail",
     ),
+    path("realtime-test/", RealtimeTestView.as_view(), name="realtime-test"),
 ]
