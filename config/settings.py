@@ -151,3 +151,6 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
+
+# Mock payment gateway (development only)
+MOCK_GATEWAY_URL = "http://127.0.0.1:8000/api/payments/mock-gateway/"
