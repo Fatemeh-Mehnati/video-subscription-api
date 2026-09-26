@@ -5,6 +5,9 @@ from django.contrib import admin
 
 from .models import Category, Video
 
+from .models import Comment, Favorite, Rating, WatchHistory
+
+admin.site.register([WatchHistory, Rating, Comment, Favorite])
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
